@@ -1,3 +1,4 @@
+const { required } = require("joi")
 const mongoose = require("mongoose")
 
 const courseSchema = new mongoose.Schema({
@@ -18,11 +19,18 @@ const courseSchema = new mongoose.Schema({
     },
     teacher: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        required: true
     },
     category: {
+        type: String,
+        required: true,
+        minlength: 3,
+        enum: ["dasturlash", "dizayn", "marketing", "biznes", "til", "matematika"]
+    },
+    user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Category"
+        ref: "User"
     }
 }, { timestamps: true })
 
