@@ -1,6 +1,7 @@
 require("dotenv").config()
 const express = require("express")
 const mongoose = require("mongoose")
+const { errorHandler } = require("./middleware/errorHandler")
 const app = express()
 app.use(express.json())
 
@@ -16,7 +17,10 @@ const enrollmentRoute = require("./routes/enrollment.route")
 app.use("/auth", authRoute)
 app.use("/course", courseRoute)
 app.use("/enrollment", enrollmentRoute)
+app.use("/uploads", express.static("uploads"))
 
+
+app.use(errorHandler)
 app.listen(process.env.PORT, () => {
     console.log("Server is running on port ", process.env.BASE_URL)
 })
