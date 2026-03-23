@@ -3,11 +3,13 @@ const mongoose = require("mongoose")
 const enrollmentSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: "User",
+        required: true
     },
     course: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Course"
+        ref: "Course",
+        required: true
     },
     status: {
         type: String,
@@ -21,6 +23,8 @@ const enrollmentSchema = new mongoose.Schema({
         max: 100
     }
 }, { timestamps: true })
+
+enrollmentSchema.index({ user: 1, course: 1 }, { unique: true })
 
 const Enrollment = mongoose.model("Enrollment", enrollmentSchema)
 

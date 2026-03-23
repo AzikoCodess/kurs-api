@@ -11,10 +11,11 @@ mongoose.connect(process.env.MONGO_URL)
 
 const authRoute = require("./routes/auth.route")
 const courseRoute = require("./routes/course.route")
+const enrollmentRoute = require("./routes/enrollment.route")
 
 app.use("/auth", authRoute)
 app.use("/course", courseRoute)
-
+app.use("/enrollment", enrollmentRoute)
 
 app.listen(process.env.PORT, () => {
     console.log("Server is running on port ", process.env.BASE_URL)

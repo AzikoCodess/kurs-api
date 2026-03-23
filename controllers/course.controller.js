@@ -55,4 +55,22 @@ const myKurs = async (req, res) => {
         res.status(500).json({ error: "Serverda xatolik!" })
     }
 }
-module.exports = { createKurs, allKurs, updateKurs, myKurs }
+
+const deleteKurs = async (req, res) => {
+    try {
+        const { id } = req.params
+        if (req.user.role !== "admin") {
+            return res.status(404).json({ error: "Faqat admin o'chira oladi" })
+        }
+        const courseId = await Course.findByIdAndDelete(id)
+        if (!courseId) {
+            return res.status(404).json({ error: "Kurs topilmadi" })
+        }
+        await Course.findByIdAndDelete(id)
+        res.status(200).json({ message: "Kurs o'chirildi" })
+    } catch (error) {
+        res.status(500).json({ error: "Serverda xatolik!" })
+    }
+}
+
+module.exports = { createKurs, allKurs, updateKurs, myKurs, deleteKurs }
