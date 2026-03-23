@@ -19,17 +19,23 @@ const createKurs = async (req, res) => {
         res.status(500).json({ error: error.message })
     }
 }
-
+// mongoDB ni _doc dan foydalandik uncha tushunmadim
 const allKurs = async (req, res) => {
     try {
         const allKurs = await Course.find()
             .populate("teacher", "username")
-        res.status(200).json({ allKurs })
+        const result = allKurs.map(course => {
+            return {
+                ...course._doc,
+                image: course.image ? `${process.env.BASE_URL}/uploads/${course.image}}` : null
+            }
+        })
+        res.status(200).json({ allKurs: result })
     } catch (error) {
         next(error)
     }
 }
-
+// toObject dan foydalandik tushunarli boldi
 const allCourse = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1
@@ -41,11 +47,16 @@ const allCourse = async (req, res, next) => {
             .populate("teacher", "username")
             .skip(skip)
             .limit(limit)
-
+        const result = courses.map(course => {
+            return {
+                ...course.toObject(),
+                image: course.image ? `${process.env.BASE_URL}/uploads/${course.image}` : null
+            }
+        })
         res.status(200).json({
             total, page,
             totalPages: Math.ceil(total / limit),
-            courses
+            courses: result
         })
 
     } catch (error) {
