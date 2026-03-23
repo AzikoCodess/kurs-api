@@ -1,6 +1,7 @@
 const Course = require("../models/Course.model")
 const Enrollment = require("../models/Enrollment.model")
 const userDto = require("../dtos/user.dto")
+const mongoose = require("mongoose")
 
 
 const createKurs = async (req, res) => {
@@ -22,25 +23,30 @@ const allKurs = async (req, res) => {
         const allKurs = await Course.find()
             .populate("teacher", "username")
             .populate("category")
-        res.status(200).json(allKurs)
+        res.status(200).json({ allKurs })
     } catch (error) {
+        console.log(error)
         res.status(500).json({ error: "Serverda xatolik!" })
     }
 }
 
 const updateKurs = async (req, res) => {
     try {
-        const { id } = req.body
-        const courseId = await Course.findById(id)
-        if (!courseId) {
-            return res.status(404).json({ error: "Kurs topilmadi!" })
-        }
-        if (req.user.role !== "admin" && req.user.id !== courseId.user.toString()) {
+        const { id } = req.params
+        const foundCourse = await Course.findById(id)
+        if (req.user.role !== "admin" && req.user.id !== foundCourse.user.toString()) {
             return res.status(403).json({ error: "Sizga ruxsat yo'q!" })
+        }
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Kurs id si xato yozilgan!" })
+        }
+        if (!foundCourse) {
+            return res.status(404).json({ error: "Kurs topilmadi!" })
         }
         await Course.findByIdAndUpdate(id, req.body, { new: true })
         res.status(200).json({ message: "Yangilandi!" })
     } catch (error) {
+        console.log(error)
         res.status(500).json({ error: "Serverda xatolik!" })
     }
 }
@@ -62,8 +68,11 @@ const deleteKurs = async (req, res) => {
         if (req.user.role !== "admin") {
             return res.status(404).json({ error: "Faqat admin o'chira oladi" })
         }
-        const courseId = await Course.findByIdAndDelete(id)
-        if (!courseId) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ error: "Kurs id si xato yozilgan!" })
+        }
+        const foundCourse = await Course.findByIdAndDelete(id)
+        if (!foundCourse) {
             return res.status(404).json({ error: "Kurs topilmadi" })
         }
         await Course.findByIdAndDelete(id)
